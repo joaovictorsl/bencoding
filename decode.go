@@ -8,6 +8,22 @@ import (
 	"unicode"
 )
 
+func DecodeTo[T any](encodedData *bufio.Reader) (castedData T, err error) {
+	var zero T
+
+	data, err := decodeNext(encodedData)
+	if err != nil {
+		return zero, err
+	}
+
+	castedData, ok := data.(T)
+	if !ok {
+		return zero, NewErrCastFail(data, castedData)
+	}
+
+	return castedData, nil
+}
+
 func Decode(encodedData *bufio.Reader) (data interface{}, err error) {
 	return decodeNext(encodedData)
 }
@@ -83,7 +99,7 @@ func decodeInteger(encodedData *bufio.Reader) (data interface{}, err error) {
 	if dataStr == "-0" {
 		return nil, ErrMinusZeroInteger
 	} else if len(dataStr) > 1 && strings.ReplaceAll(dataStr, "-", "")[0] == '0' {
-		return nil, ErrLeadingZeroInteger
+		return nil, NewErrLeadingZeroInteger(dataStr)
 	}
 
 	return strconv.Atoi(dataStr)

@@ -1,10 +1,30 @@
 package bencoding_test
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/joaovictorsl/bencoding"
 )
+
+func TestEncodeInvalidType(t *testing.T) {
+	// Setup
+	type invalid struct {
+		Name string
+	}
+	invalidType := invalid{Name: "invalidType"}
+	// Action
+	encodedString, err := bencoding.Encode(invalidType)
+	// Assert
+	expectedErr := bencoding.NewErrInvalidType(invalidType)
+	if err == nil {
+		t.Error("expected error, got nil")
+	} else if !errors.Is(expectedErr, err) {
+		t.Errorf("expected error to be \"%s\", got \"%s\"", expectedErr, err)
+	} else if encodedString != "" {
+		t.Errorf("expected encodedString to be empty when an error happens, got %s", encodedString)
+	}
+}
 
 func TestEncodeDictionary(t *testing.T) {
 	// Setup

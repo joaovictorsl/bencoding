@@ -164,11 +164,15 @@ func TestDecodeIntegerLeadingZero(t *testing.T) {
 	}
 
 	for _, errCase := range errCases {
+		// Action
 		data, err := bencoding.Decode(bufio.NewReader(bytes.NewReader(errCase.encoded)))
+		// Assert
+		encodedStr := string(errCase.encoded)
+		expectedErr := bencoding.NewErrLeadingZeroInteger(encodedStr[1 : len(encodedStr)-1])
 		if err == nil {
 			t.Error("expected error, got nil")
-		} else if !errors.Is(bencoding.ErrLeadingZeroInteger, err) {
-			t.Errorf("expected error to be %v, got %v", bencoding.ErrLeadingZeroInteger, err)
+		} else if !errors.Is(expectedErr, err) {
+			t.Errorf("expected error to be \"%v\", got \"%v\"", expectedErr, err)
 		} else if data != nil {
 			t.Errorf("expected data to be nil when error happens, got %v", data)
 		}

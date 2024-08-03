@@ -20,7 +20,7 @@ func encodeNext(data interface{}) (encodedData string, err error) {
 	} else if dict, ok := data.(map[string]interface{}); ok {
 		return encodeDictionary(dict)
 	} else {
-		return "", err // TODO: create error
+		return "", NewErrInvalidType(data)
 	}
 }
 
